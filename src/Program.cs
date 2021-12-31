@@ -5,7 +5,7 @@ namespace src
 {
     class User
     {
-        public static string[] input;
+        public static string input;
 
         public static void Main() {
             Console.Title = "TRASH";
@@ -15,7 +15,7 @@ namespace src
             
             while(true) {
                 Console.Write(">>> ");
-                input = Console.ReadLine().Split(' ');
+                input = Console.ReadLine();
                 Commands.interpret(input);
             }
         }
@@ -25,8 +25,8 @@ namespace src
     {
         static string versionNo = "v0.0.1";
 
-        public static void interpret(string[] input) {
-            string keyword = input[0];
+        public static void interpret(string input) {
+            string keyword = input.Split(' ')[0];
             switch(keyword.ToLower()) {
                 case "clr":
                     Console.Clear();
@@ -36,10 +36,6 @@ namespace src
                     break;
                 case "tch":
                     touch();
-                    break;
-                case "del":
-                case "dst":
-                    destroy();
                     break;
                 case "ech":
                     echo();
@@ -58,26 +54,35 @@ namespace src
         }
 
         static void touch() {
-            File.Create(User.input[1]);
-        }
-
-        static void destroy() {
-            Console.Write("Are you sure you want to delete this file/folder? (y/n)");
-            string tempInput = Console.ReadLine();
-            if(tempInput == "y") {File.Delete(User.input[1]);}
+            File.Create(hlp.stringbetweenchr(User.input, '"', '"'));
         }
 
         static void echo() {
-           string tempInput = String.Join(" ", User.input);
-           tempInput = tempInput.Substring(3); 
-           Console.WriteLine(tempInput.Substring(0));
+           Console.WriteLine(User.input.Substring(3).Substring(1));
         }
 
         static void list() {
-            string[] contents = File.ReadAllLines(User.input[1]);
+            string dir = hlp.stringbetweenchr(User.input, '"', '"');
+            string[] contents = File.ReadAllLines(dir);
             foreach(string line in contents) {
                 Console.WriteLine(line);
             }
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        }
+    }
+
+    class hlp
+    {
+        public static string stringbetweenchr(string input, char charFrom, char charTo) {
+            int posFrom = input.IndexOf(charFrom);
+            if (posFrom != -1) {
+                int posTo = input.IndexOf(charTo, posFrom + 1);
+                if (posTo != -1) {
+                    return input.Substring(posFrom + 1, posTo - posFrom - 1);
+                }
+            }
+
+            return string.Empty;
         }
     }
 }
